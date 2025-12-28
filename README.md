@@ -41,7 +41,9 @@ Perfect for users with limited VRAM (6–12GB) who frequently switch between mod
 - No additional pip dependencies required (uses built-in Python libraries).
 
 ## How to Use
-1. Place `start_comfy.py` in your ComfyUI root folder (where `main.py` is).
+1. **Get the script:** - [Download `start_comfy.py`](https://github.com/Cordux/comfy-modular-launcher/raw/main/start_comfy.py) (Right-click -> Save Link As...)
+   - **OR** Copy the code manually from this repo into a new text file named `start_comfy.py`.
+2. **Placement:** Place `start_comfy.py` in your ComfyUI root folder (where `main.py` is).
     <details>
         <summary><b>Placement</b></summary>
       
@@ -52,7 +54,7 @@ Perfect for users with limited VRAM (6–12GB) who frequently switch between mod
         ├── models/
         └── custom_nodes/
     </details>
-2. Run `start_comfy.py` (double-click) or:
+3. Run `start_comfy.py` (double-click) or:
     <details>
     <summary><b>Run in the terminal</b></summary>
 
@@ -63,8 +65,8 @@ Perfect for users with limited VRAM (6–12GB) who frequently switch between mod
     python start_comfy.py
     ```
     </details>
-3. First run creates `comfy_launcher_config.json` — edit it to set your paths and modes.
-4. Choose a mode and launch!
+4. First run creates `comfy_launcher_config.json` — edit it to set your paths and modes.
+5. Choose a mode and launch!
 
 ## Customization
 Edit `comfy_launcher_config.json`:
