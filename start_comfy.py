@@ -1,6 +1,7 @@
 import os
 import subprocess
 import json
+import platform
 from pathlib import Path
 
 # Path to config file (next to the script)
@@ -8,29 +9,13 @@ CONFIG_FILE = Path(__file__).parent / "comfy_launcher_config.json"
 
 # Default configuration
 DEFAULT_CONFIG = {
-    "global_output_directory": r"C:\AI\ComfyUI_outputs",  # Change this to your main folder
-    "comfyui_path": ".",  # Folder where ComfyUI's main.py is located
+    "global_output_directory": r"output",
+    "comfyui_path": ".",
     "modes": {
-        "1": {
-            "name": "Z-Image-Turbo (GGUF - Normal VRAM)",
-            "flags": "--enable-manager",
-            "subfolder": "Z_Turbo"
-        },
-        "2": {
-            "name": "SDXL Lightning/Turbo (Low VRAM)",
-            "flags": "--enable-manager --lowvram --force-fp16 --disable-smart-memory",
-            "subfolder": "SDXL_Lightning"
-        },
-        "3": {
-            "name": "Flux GGUF (Balanced)",
-            "flags": "--enable-manager --force-fp16 --cuda-malloc",
-            "subfolder": "Flux"
-        },
-        "4": {
-            "name": "Default / High VRAM (No Subfolder)",
-            "flags": "--enable-manager",
-            "subfolder": ""
-        }
+        "1": {"name": "Z-Image-Turbo (GGUF)", "flags": "--enable-manager", "subfolder": "Z_Turbo"},
+        "2": {"name": "SDXL Lightning/Turbo (Low VRAM)", "flags": "--enable-manager --lowvram --force-fp16 --disable-smart-memory", "subfolder": "SDXL_Lightning"},
+        "3": {"name": "Flux GGUF (Balanced)", "flags": "--enable-manager --force-fp16 --cuda-malloc", "subfolder": "Flux"},
+        "4": {"name": "Default / High VRAM", "flags": "--enable-manager", "subfolder": ""},
     }
 }
 
@@ -42,45 +27,36 @@ else:
     config = DEFAULT_CONFIG
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4)
-    print(f"Created default config at {CONFIG_FILE}")
-    print("Please edit comfy_launcher_config.json to set your paths and modes.")
 
-# Build menu
-print("=== ComfyUI Modular Launcher ===\n")
-print(f"Global Output Base: {config['global_output_directory']}\n")
+# Main loop
+while True:
+    os.system('cls' if platform.system() == 'Windows' else 'clear')
+    print("=== ComfyUI Modular Launcher ===")
+    print(f"Global Output Folder: {config['global_output_directory']}\n")
 
-for key, mode in config["modes"].items():
-    sub = mode.get("subfolder", "").strip()
-    final_output = config["global_output_directory"]
-    if sub:
-        final_output = os.path.join(final_output, sub)
-    print(f"{key}: {mode['name']}")
-    print(f"     → Saves to: {final_output}\n")
+    for key, mode in config["modes"].items():
+        sub = mode.get("subfolder", "")
+        print(f"{key}: {mode['name']}")
+        print(f"    → Subfolder: {sub if sub else '[Global Root]'}\n")
 
-choice = input("Choose startup mode (or press Enter to quit): ").strip()
+    print("Q: Quit Launcher")
+    choice = input("\nChoose a mode (e.g 1) or Q to quit: ").strip().lower()
 
-if not choice:
-    print("Goodbye!")
-elif choice in config["modes"]:
-    mode = config["modes"][choice]
-    
-    # Build final output path
-    base_output = config["global_output_directory"]
-    subfolder = mode.get("subfolder", "").strip()
-    final_output = os.path.join(base_output, subfolder) if subfolder else base_output
-    
-    # Create directory if needed
-    os.makedirs(final_output, exist_ok=True)
-    
-    # Build command
-    base_cmd = f'python main.py --output-directory "{final_output}"'
-    full_cmd = f'{base_cmd} {mode["flags"]}'.strip()
-    
-    print(f"\nLaunching: {mode['name']}")
-    print(f"Output: {final_output}")
-    print(f"Command: {full_cmd}\n")
-    
-    os.chdir(config["comfyui_path"])
-    subprocess.call(full_cmd, shell=True)
-else:
-    print("Invalid choice.")
+    if choice == 'q':
+        print("\nExiting...")
+        break
+
+    elif choice in config["modes"]:
+        mode = config["modes"][choice]
+        final_output = os.path.join(config["global_output_directory"], mode.get("subfolder", ""))
+        os.makedirs(final_output, exist_ok=True)
+
+        full_cmd = f'python main.py --output-directory "{final_output}" {mode["flags"]}'.strip()
+
+        print(f"\nLaunching: {mode['name']}...")
+        os.chdir(config["comfyui_path"])
+        subprocess.call(full_cmd, shell=True)
+        break # Exit launcher once ComfyUI is closed
+
+    else:
+        input("\nInvalid choice! Press Enter to try again...") # Pause so user can read the error
