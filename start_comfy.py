@@ -3,6 +3,37 @@ import subprocess
 import json
 import platform
 from pathlib import Path
+import psutil
+
+def kill_comfyui_python():
+    print("🔍 Checking for running ComfyUI Python processes...")
+
+    found = False
+    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            cmd = proc.info['cmdline'] or []
+            if len(cmd) == 0:
+                continue
+
+            # Hoppa över vår egen process
+            if proc.pid == os.getpid():
+                continue
+
+            # Leta efter python som kör main.py i ComfyUI
+            if ("python" in proc.info['name'].lower() or "python" in " ".join(cmd).lower()) and "main.py" in cmd:
+                found = True
+                print(f"⚠️ Found running ComfyUI instance (PID {proc.pid}) — terminating...")
+                proc.terminate()
+                try:
+                    proc.wait(timeout=5)
+                except psutil.TimeoutExpired:
+                    proc.kill()
+
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+
+    if not found:
+        print("✔️ No existing ComfyUI Python processes running.")
 
 # Path to config file (next to the script)
 CONFIG_FILE = Path(__file__).parent / "comfy_launcher_config.json"
@@ -50,6 +81,9 @@ while True:
         mode = config["modes"][choice]
         final_output = os.path.join(config["global_output_directory"], mode.get("subfolder", ""))
         os.makedirs(final_output, exist_ok=True)
+        
+        # Kill existing ComfyUI python processes
+        kill_comfyui_python()
 
         full_cmd = f'python main.py --output-directory "{final_output}" {mode["flags"]}'.strip()
 
