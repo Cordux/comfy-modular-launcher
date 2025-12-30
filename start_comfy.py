@@ -5,6 +5,13 @@ import platform
 from pathlib import Path
 import psutil
 
+
+def get_python_executable():
+    portable_python = Path("python_embeded/python.exe")
+    if portable_python.exists():
+        return str(portable_python)
+    return "python"
+
 def kill_comfyui_python():
     print("🔍 Checking for running ComfyUI Python processes...")
 
@@ -85,7 +92,9 @@ while True:
         # Kill existing ComfyUI python processes
         kill_comfyui_python()
 
-        full_cmd = f'python main.py --output-directory "{final_output}" {mode["flags"]}'.strip()
+        python_exec = get_python_executable()
+        full_cmd = f'"{python_exec}" main.py --output-directory "{final_output}" {mode["flags"]}'.strip()
+
 
         print(f"\nLaunching: {mode['name']}...")
         os.chdir(config["comfyui_path"])
