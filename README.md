@@ -146,6 +146,9 @@ Edit `comfy_launcher_config.json`:
 * **"Permissions Errors"**
 * If your `global_output_directory` requires Admin rights, try running the script as Administrator or change the path to a user folder.
 
+## Other Tools
+[Model linker](https://github.com/Cordux/comfy-modular-launcher/tree/main/Tools/Model_linker)
+
 ## Contributing
 Contributions are welcome! If you have ideas for new features, better default flags for specific models, or bug fixes:
 
@@ -159,6 +162,7 @@ Contributions are welcome! If you have ideas for new features, better default fl
 - [ ] Support for environment variable toggles.
 - [ ] Auto-update check for the launcher script.
 - [ ] Presets for Flux.1 dev/schnell modes.
+- [x] Add portable version support.
 
 ## Credit
 
